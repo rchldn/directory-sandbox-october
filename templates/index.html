@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musician Search</title>
+</head>
+<body>
+    <h1>Search Musicians by Location</h1>
+    <form action="/search" method="GET">
+        <label for="location">Select a location:</label>
+        <select name="location" id="location">
+            {% for location in locations %}
+                <option value="{{ location[0] }}">{{ location[1] }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if musicians %}
+    <h2>Results:</h2>
+    <ul>
+        {% for musician in musicians %}
+            <li>{{ musician[1] }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</body>
+</html>
