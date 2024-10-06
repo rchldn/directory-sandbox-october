@@ -28,16 +28,26 @@ def get_musicians_by_location_and_instruments(location_id, instrument_ids, skill
         WHERE ml.location_id = ?
         AND mi.instrument_id IN ({', '.join('?' for _ in instrument_ids)})
         GROUP BY m.id
-        HAVING COUNT(DISTINCT mi.instrument_id) = ?
+        HAVING COUNT(DISTINCT mi.instrument_id) >= ?
     """
+
+ # Debugging: Print the query and parameters
+    print("SQL Query:", query)  # Debug statement
+    print("Parameters:", [location_id] + instrument_ids + [len(instrument_ids)])  # Debug statement
+
 
         # Add skill level filter for each instrument (if specified)
     skill_conditions = []
     skill_params = []
-    for i, skill_level in enumerate(skill_levels):
-        if skill_level:
-            skill_conditions.append(f"mi.instrument_id = ? AND mi.skill_level >= ?")
-            skill_params.extend([instrument_ids[i], skill_level])
+    for i in range(len(instrument_ids)):
+        if i < len(skill_levels) and skill_levels[i]:  # Ensure we don't go out of range
+            skill_conditions.append("mi.instrument_id = ? AND mi.skill_level >= ?")
+            skill_params.extend([instrument_ids[i], skill_levels[i]])
+        # Ian added the above to make multiple searches work (before it was throwing an index error)
+        # Ian: Something in either these sections (above or below) or the query is making it so 
+        # we are able to select multiple instruments (piano, flute for alice) and show alice correctly
+        # but we can only select a single skill_level, if we select more than 1 skill level it shows nobody
+        # Why does the skill conditions join happen outside of the query?
 
     if skill_conditions:
         skill_query = " AND " + " AND ".join(skill_conditions)
@@ -49,6 +59,9 @@ def get_musicians_by_location_and_instruments(location_id, instrument_ids, skill
     cursor.execute(query, params)
     musicians = cursor.fetchall()
     conn.close()
+
+    print("fetched musicians:", musicians)
+
     return musicians
 
 @app.route('/')
