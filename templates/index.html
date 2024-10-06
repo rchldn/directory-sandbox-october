@@ -4,18 +4,158 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Musician Search</title>
+    <script>
+        // JavaScript to show/hide skill level dropdowns based on instrument selection
+        function toggleSkillLevel(instrumentId) {
+            var checkbox = document.getElementById("instrument_" + instrumentId);
+            var skillDropdown = document.getElementById("skill_" + instrumentId);
+            if (checkbox.checked) {
+                skillDropdown.style.display = 'inline';
+            } else {
+                skillDropdown.style.display = 'none';
+                skillDropdown.value = ""; // Reset skill level selection
+            }
+        }
+    </script>
 </head>
 <body>
-    <h1>Search Musicians by Location</h1>
-    <form action="/search" method="GET">
+    <h1>Search for Musicians</h1>
+    <form action="/search" method="GET"> 
         <label for="location">Select a location:</label>
-        <select name="location" id="location">
-            {% for location in locations %}
-                <option value="{{ location[0] }}">{{ location[1] }}</option>
+            <select name="location" id="location">
+    {% for location in locations %}
+        <option value="{{ location[0] }}" {% if location[0] == request.args.get('location') %}selected{% endif %}>{{ location[1] }}</option>
+    {% endfor %}
+            </select>
+            <br>
+
+
+    <h2>Select Instruments and Skill Levels:</h2>
+            <!-- Flute -->
+            <input type="checkbox" name="instruments" value="1" id="instrument_1" onclick="toggleSkillLevel(1)" {% if 1 in selected_instruments %}checked{% endif %}>
+            <label for="flute">Flute</label>
+            <select name="skill_levels" id="skill_1" style="display:none;">
+                <option value="">--Select skill level--</option>
+                {% for level in range(1, 11) %}
+                    <option value="{{ level }}" {% if selected_skills and selected_skills[0] == level %}selected{% endif %}>{{ level }}</option>
+                {% endfor %}
+            </select>
+            <br>
+    
+            <!-- Piano -->
+            <input type="checkbox" name="instruments" value="2" id="instrument_2" onclick="toggleSkillLevel(2)" {% if 2 in selected_instruments %}checked{% endif %}>
+            <label for="piano">Piano</label>
+            <select name="skill_levels" id="skill_2" style="display:none;">
+                <option value="">--Select skill level--</option>
+                {% for level in range(1, 11) %}
+                    <option value="{{ level }}" {% if selected_skills and selected_skills[1] == level %}selected{% endif %}>{{ level }}</option>
+                {% endfor %}
+            </select>
+            <br>
+    
+            <!-- Organ -->
+            <input type="checkbox" name="instruments" value="3" id="instrument_3" onclick="toggleSkillLevel(3)" {% if 3 in selected_instruments %}checked{% endif %}>
+            <label for="organ">Organ</label>
+            <select name="skill_levels" id="skill_3" style="display:none;">
+                <option value="">--Select skill level--</option>
+                {% for level in range(1, 11) %}
+                    <option value="{{ level }}" {% if selected_skills and selected_skills[2] == level %}selected{% endif %}>{{ level }}</option>
+                {% endfor %}
+            </select>
+            <br>
+    
+            <!-- Guitar -->
+            <input type="checkbox" name="instruments" value="4" id="instrument_4" onclick="toggleSkillLevel(4)" {% if 4 in selected_instruments %}checked{% endif %}>
+            <label for="guitar">Guitar</label>
+            <select name="skill_levels" id="skill_4" style="display:none;">
+                <option value="">--Select skill level--</option>
+                {% for level in range(1, 11) %}
+                    <option value="{{ level }}" {% if selected_skills and selected_skills[3] == level %}selected{% endif %}>{{ level }}</option>
+                {% endfor %}
+            </select>
+            <br>
+    
+            <!-- Percussion -->
+            <input type="checkbox" name="instruments" value="5" id="instrument_5" onclick="toggleSkillLevel(5)" {% if 5 in selected_instruments %}checked{% endif %}>
+            <label for="percussion">Percussion</label>
+            <select name="skill_levels" id="skill_5" style="display:none;">
+                <option value="">--Select skill level--</option>
+                {% for level in range(1, 11) %}
+                    <option value="{{ level }}" {% if selected_skills and selected_skills[4] == level %}selected{% endif %}>{{ level }}</option>
+                {% endfor %}
+            </select>
+            <br>
+    <!-- <div>
+        <input type="checkbox" id="flute" name="instruments" value="Flute" {% if 'Flute' in selected_instruments %}checked{% endif %}> <!--value = "1" here or value = flute?-->
+     <!--   <label for="flute">Flute</label>
+        <select id="flute_skill" name="flute_skill" {% if 'Flute' not in selected_instruments %}style="display:none;"{% endif %}>
+            <option value="">Any Level</option>
+            {% for level in range(1, 11) %}
+                <option value="{{ level }}" {% if selected_flute_skill == level %}selected{% endif %}>
+                    {{ level }}
+                </option>
+            {% endfor %}
+        </select> -->
+
+        <!-- <label><input type="checkbox" name="instruments" value="1" {% if '1' in request.args.getlist('instruments') %}checked{% endif %}> Flute</label><br>
+        <label><input type="checkbox" name="instruments" value="2" {% if '2' in request.args.getlist('instruments') %}checked{% endif %}> Piano</label><br>
+        <label><input type="checkbox" name="instruments" value="3" {% if '3' in request.args.getlist('instruments') %}checked{% endif %}> Organ</label><br>
+        <label><input type="checkbox" name="instruments" value="4" {% if '4' in request.args.getlist('instruments') %}checked{% endif %}> Guitar</label><br>
+        <label><input type="checkbox" name="instruments" value="5" {% if '5' in request.args.getlist('instruments') %}checked{% endif %}> Percussion</label><br> -->
+        <!-- commented out for now, but this was working to keep checkboxes checked for each instrument that was already selected for the search -->
+
+   <!-- <div>
+        <input type="checkbox" id="piano" name="instruments" value="Piano" {% if 'Piano' in selected_instruments %}checked{% endif %}>
+        <label for="piano">Piano</label>
+        <select id="piano_skill" name="piano_skill" {% if 'Piano' not in selected_instruments %}style="display:none;"{% endif %}>
+            <option value="">Any Level</option>
+            {% for level in range(1, 11) %}
+                <option value="{{ level }}" {% if selected_piano_skill == level %}selected{% endif %}>
+                    {{ level }}
+                </option>
             {% endfor %}
         </select>
-        <button type="submit">Search</button>
-    </form>
+    </div>
+    <div>
+        <input type="checkbox" id="organ" name="instruments" value="Organ" {% if 'Organ' in selected_instruments %}checked{% endif %}>
+        <label for="organ">Organ</label>
+        <select id="organ_skill" name="organ_skill" {% if 'Organ' not in selected_instruments %}style="display:none;"{% endif %}>
+            <option value="">Any Level</option>
+            {% for level in range(1, 11) %}
+                <option value="{{ level }}" {% if selected_organ_skill == level %}selected{% endif %}>
+                    {{ level }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <input type="checkbox" id="guitar" name="instruments" value="Guitar" {% if 'Guitar' in selected_instruments %}checked{% endif %}>
+        <label for="guitar">Guitar</label>
+        <select id="guitar_skill" name="guitar_skill" {% if 'Guitar' not in selected_instruments %}style="display:none;"{% endif %}>
+            <option value="">Any Level</option>
+            {% for level in range(1, 11) %}
+                <option value="{{ level }}" {% if selected_guitar_skill == level %}selected{% endif %}>
+                    {{ level }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <input type="checkbox" id="percussion" name="instruments" value="Percussion" {% if 'Percussion' in selected_instruments %}checked{% endif %}>
+        <label for="percussion">Percussion</label>
+        <select id="percussion_skill" name="percussion_skill" {% if 'Percussion' not in selected_instruments %}style="display:none;"{% endif %}>
+            <option value="">Any Level</option>
+            {% for level in range(1, 11) %}
+                <option value="{{ level }}" {% if selected_percussion_skill == level %}selected{% endif %}>
+                    {{ level }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>-->
+    <button type="submit">Search</button>
+</form>
+
+
 
     {% if musicians %}
     <h2>Results:</h2>
