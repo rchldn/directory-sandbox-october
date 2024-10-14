@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import sqlite3
 
 app = Flask(__name__)
@@ -120,25 +120,42 @@ def index():
     print("Locations fetched from database:", locations)  # Debug statement
     return render_template('index.html', locations=locations)
 
-@app.route('/search', methods=['GET'])
-def search():
+@app.route('/filter_musicians', methods=['GET'])
+def filter_musicians():
     location_id = request.args.get('location')
     instruments = request.args.getlist('instruments')
     skill_levels = request.args.getlist('skill_levels')
-    print(f"Instruments selected: {instruments}")
-    print("Submitted skill levels:", skill_levels) # debug statement 
 
-    # Convert instrument IDs to integers
+    # Convert instrument IDs and skill levels to integers
     instrument_ids = list(map(int, instruments)) if instruments else []
-    # Convert skill levels to integers, ignoring empty strings
-    skill_levels = [int(level) for level in skill_levels if level.isdigit()] #check this
-    locations = get_locations()
+    skill_levels = [int(level) for level in skill_levels if level.isdigit()]
+
     musicians = []
 
     if location_id and instrument_ids:
         musicians = get_musicians_by_location_and_instruments(location_id, instrument_ids, skill_levels)
 
-    return render_template('index.html', locations=locations, musicians=musicians, selected_location=location_id, selected_instruments=instrument_ids, selected_skills=skill_levels)
+    return jsonify(musicians)
+
+# @app.route('/search', methods=['GET'])
+# def search():
+#     location_id = request.args.get('location')
+#     instruments = request.args.getlist('instruments')
+#     skill_levels = request.args.getlist('skill_levels')
+#     print(f"Instruments selected: {instruments}")
+#     print("Submitted skill levels:", skill_levels) # debug statement 
+
+#     # Convert instrument IDs to integers
+#     instrument_ids = list(map(int, instruments)) if instruments else []
+#     # Convert skill levels to integers, ignoring empty strings
+#     skill_levels = [int(level) for level in skill_levels if level.isdigit()] #check this
+#     locations = get_locations()
+#     musicians = []
+
+#     if location_id and instrument_ids:
+#         musicians = get_musicians_by_location_and_instruments(location_id, instrument_ids, skill_levels)
+
+#     return render_template('index.html', locations=locations, musicians=musicians, selected_location=location_id, selected_instruments=instrument_ids, selected_skills=skill_levels)
 
 if __name__ == '__main__':
     app.run(debug=True)
