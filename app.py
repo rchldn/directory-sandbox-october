@@ -41,7 +41,8 @@ def get_musicians_by_location_and_instruments(location_id, instrument_ids, skill
         params.extend([instrument_id, skill_levels[i]])
 
     # GROUP BY clause to ensure unique musicians are returned
-    query += " GROUP BY m.id"    
+    query += " GROUP BY m.id HAVING COUNT(DISTINCT mi.instrument_id) = ?"    
+    params.append(len(instrument_ids))  # Ensure all instruments are matched
 
 
     # commenting this out for now but this is what we were working with before
@@ -124,6 +125,7 @@ def search():
     location_id = request.args.get('location')
     instruments = request.args.getlist('instruments')
     skill_levels = request.args.getlist('skill_levels')
+    print(f"Instruments selected: {instruments}")
     print("Submitted skill levels:", skill_levels) # debug statement 
 
     # Convert instrument IDs to integers
