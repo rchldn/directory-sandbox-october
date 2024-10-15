@@ -148,8 +148,8 @@
     <input type="checkbox" name="instruments" value="{{ i }}" id="instrument_{{ i }}" onclick="toggleSkillLevel({ i })" {% if i in selected_instruments %}checked{% endif %}>
     <label for="instrument_{{ i }}">{{ ["Flute", "Piano", "Organ", "Guitar", "Percussion"][i-1] }}</label>
     <select name="skill_levels" id="skill_{{ i }}" style="display:none;">
-        <option value="">--Select skill level--</option>
-        {% for level in range(1, 11) %}
+        <option value="">1</option>
+        {% for level in range(2, 11) %}
             <option value="{{ level }}" {% if selected_skills and selected_skills[i-1] == level %}selected{% endif %}>{{ level }}</option>
         {% endfor %}
     </select>
