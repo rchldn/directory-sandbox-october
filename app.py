@@ -37,8 +37,13 @@ def get_musicians_by_location_and_instruments(location_id, instrument_ids, skill
 
     # Add skill level conditions for each instrument
     for i, instrument_id in enumerate(instrument_ids):
-        query += f" AND EXISTS (SELECT 1 FROM musician_instruments mi_skill{i} WHERE m.id = mi_skill{i}.musician_id AND mi_skill{i}.instrument_id = ? AND mi_skill{i}.skill_level >= ?)"
-        params.extend([instrument_id, skill_levels[i]])
+        if i < len(skill_levels) and skill_levels[i]:  # Only add the condition if skill level is specified
+            query += f" AND EXISTS (SELECT 1 FROM musician_instruments mi_skill{i} WHERE m.id = mi_skill{i}.musician_id AND mi_skill{i}.instrument_id = ? AND mi_skill{i}.skill_level >= ?)"
+            params.extend([instrument_id, skill_levels[i]])
+        else:
+            # If no skill level is specified, just ensure this instrument is included in the results
+            query += f" AND mi.instrument_id = ?"
+            params.append(instrument_id)
 
     # GROUP BY clause to ensure unique musicians are returned
     query += " GROUP BY m.id HAVING COUNT(DISTINCT mi.instrument_id) = ?"    
@@ -117,8 +122,17 @@ def get_musicians_by_location_and_instruments(location_id, instrument_ids, skill
 @app.route('/')
 def index():
     locations = get_locations()
+    musicians = get_all_musicians()  # Fetch all musicians for initial load
     print("Locations fetched from database:", locations)  # Debug statement
-    return render_template('index.html', locations=locations)
+    return render_template('index.html', locations=locations, musicians=musicians)
+
+def get_all_musicians():
+    conn = sqlite3.connect('musician_database.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT m.name FROM musicians m")
+    musicians = cursor.fetchall()
+    conn.close()
+    return musicians
 
 @app.route('/filter_musicians', methods=['GET'])
 def filter_musicians():

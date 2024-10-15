@@ -139,6 +139,7 @@
 <form onsubmit="event.preventDefault(); fetchMusicians();">
     <label for="location">Select a location:</label>
     <select name="location" id="location">
+        <option value="" selected>Location</option>
         {% for location in locations %}
             <option value="{{ location[0] }}" {% if location[0] == request.args.get('location') %}selected{% endif %}>{{ location[1] }}</option>
         {% endfor %}
@@ -166,7 +167,8 @@
 <ul id="musician-list">
     {% if musicians %}
         {% for musician in musicians %}
-            <li>{{ musician[1] }}</li>
+        <li>{{ musician[0] }}</li> <!--display all musicians at start-->
+            <!-- <li>{{ musician[1] }}</li> --> <!-- this is old code from when we weren't displaying all musicians at start, might still be needed-->
         {% endfor %}
     {% else %}
         <li>No results found.</li>
