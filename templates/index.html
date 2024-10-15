@@ -88,7 +88,6 @@
     </style>
 
 <script>
-    // JavaScript to show/hide skill level dropdowns based on instrument selection
     function toggleSkillLevel(instrumentId) {
         var checkbox = document.getElementById("instrument_" + instrumentId);
         var skillDropdown = document.getElementById("skill_" + instrumentId);
@@ -113,11 +112,10 @@
             .then(response => response.json())
             .then(data => {
                 const musicianList = document.getElementById('musician-list');
-                musicianList.innerHTML = data.map(musician => `<li>${musician[1]}</li>`).join('');
+                musicianList.innerHTML = data.length > 0 ? data.map(musician => `<li>${musician[1]}</li>`).join('') : '<li>No results found.</li>';
             });
     }
 
-    // Attach event listeners on page load
     window.onload = function() {
         document.getElementById('location').addEventListener('change', fetchMusicians);
         document.querySelectorAll('input[name="instruments"]').forEach(cb => {
@@ -132,47 +130,44 @@
         });
     }
 </script>
-
 </head>
 <body>
 <h1>Search for Musicians</h1>
-<form onsubmit="event.preventDefault(); fetchMusicians();">
-    <label for="location">Select a location:</label>
-    <select name="location" id="location">
-        <option value="" selected>Location</option>
-        {% for location in locations %}
-            <option value="{{ location[0] }}" {% if location[0] == request.args.get('location') %}selected{% endif %}>{{ location[1] }}</option>
+<form>
+<label for="location">Select a location:</label>
+<select name="location" id="location">
+    <option value="" selected>Location</option>
+    {% for location in locations %}
+        <option value="{{ location[0] }}" {% if location[0] == request.args.get('location') %}selected{% endif %}>{{ location[1] }}</option>
+    {% endfor %}
+</select>
+<br>
+<!--dynamic instrument handling - may need to add to the labels for the instruments when we add more and expand the range-->
+<h2>Select Instruments and Skill Levels:</h2>
+{% for i in range(1, 6) %}
+    <input type="checkbox" name="instruments" value="{{ i }}" id="instrument_{{ i }}" onclick="toggleSkillLevel({ i })" {% if i in selected_instruments %}checked{% endif %}>
+    <label for="instrument_{{ i }}">{{ ["Flute", "Piano", "Organ", "Guitar", "Percussion"][i-1] }}</label>
+    <select name="skill_levels" id="skill_{{ i }}" style="display:none;">
+        <option value="">--Select skill level--</option>
+        {% for level in range(1, 11) %}
+            <option value="{{ level }}" {% if selected_skills and selected_skills[i-1] == level %}selected{% endif %}>{{ level }}</option>
         {% endfor %}
     </select>
     <br>
+{% endfor %}
 
-    <h2>Select Instruments and Skill Levels:</h2>
-    <!-- I think this actually fixed the dynamic problem and I accidentally copied this in from chatGPT at some point - this way we ideally don't have to write out every instrument? -->
-    {% for i in range(1, 6) %}
-        <input type="checkbox" name="instruments" value="{{ i }}" id="instrument_{{ i }}" onclick="toggleSkillLevel({ i })" {% if i in selected_instruments %}checked{% endif %}>
-        <label for="instrument_{{ i }}">{{ ["Flute", "Piano", "Organ", "Guitar", "Percussion"][i-1] }}</label> <!--this will probably have to change as we add more instruments-->
-        <select name="skill_levels" id="skill_{{ i }}" style="display:none;">
-            <option value="">--Select skill level--</option>
-            {% for level in range(1, 11) %}
-                <option value="{{ level }}" {% if selected_skills and selected_skills[i-1] == level %}selected{% endif %}>{{ level }}</option>
-            {% endfor %}
-        </select>
-        <br>
-    {% endfor %}
-    
-    <button type="button" onclick="fetchMusicians()">Search</button>
+<button type="button" onclick="fetchMusicians()">Search</button>
 </form>
 
 <h2>Results:</h2>
 <ul id="musician-list">
-    {% if musicians %}
-        {% for musician in musicians %}
-        <li>{{ musician[0] }}</li> <!--display all musicians at start-->
-            <!-- <li>{{ musician[1] }}</li> --> <!-- this is old code from when we weren't displaying all musicians at start, might still be needed-->
-        {% endfor %}
-    {% else %}
-        <li>No results found.</li>
-    {% endif %}
+{% if musicians %}
+    {% for musician in musicians %}
+        <li>{{ musician[0] }}</li>
+    {% endfor %}
+{% else %}
+    <li>No results found.</li>
+{% endif %}
 </ul>
 </body>
 </html>

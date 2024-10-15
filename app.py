@@ -153,8 +153,22 @@ def filter_musicians():
 
     if location_id and instrument_ids:
         musicians = get_musicians_by_location_and_instruments(location_id, instrument_ids, skill_levels)
+    elif location_id:
+        musicians = get_musicians_by_location(location_id)  # gets musicians by location only
+    return jsonify(musicians) # Return the musicians as JSON
 
-    return jsonify(musicians)
+def get_musicians_by_location(location_id): #for showing all musicians from one location
+    conn = sqlite3.connect('musician_database.db')
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT m.id, m.name
+        FROM musicians m
+        INNER JOIN musician_locations ml ON m.id = ml.musician_id
+        WHERE ml.location_id = ?
+    """, (location_id,))
+    musicians = cursor.fetchall()
+    conn.close()
+    return musicians
 
 # @app.route('/search', methods=['GET'])
 # def search():
