@@ -147,10 +147,10 @@
     <br>
 
     <h2>Select Instruments and Skill Levels:</h2>
-    <!-- Repeat for each instrument -->
+    <!-- I think this actually fixed the dynamic problem and I accidentally copied this in from chatGPT at some point - this way we ideally don't have to write out every instrument? -->
     {% for i in range(1, 6) %}
-        <input type="checkbox" name="instruments" value="{{ i }}" id="instrument_{{ i }}" onclick="toggleSkillLevel({{ i }})" {% if i in selected_instruments %}checked{% endif %}>
-        <label for="instrument_{{ i }}">{{ ["Flute", "Piano", "Organ", "Guitar", "Percussion"][i-1] }}</label>
+        <input type="checkbox" name="instruments" value="{{ i }}" id="instrument_{{ i }}" onclick="toggleSkillLevel({ i })" {% if i in selected_instruments %}checked{% endif %}>
+        <label for="instrument_{{ i }}">{{ ["Flute", "Piano", "Organ", "Guitar", "Percussion"][i-1] }}</label> <!--this will probably have to change as we add more instruments-->
         <select name="skill_levels" id="skill_{{ i }}" style="display:none;">
             <option value="">--Select skill level--</option>
             {% for level in range(1, 11) %}

@@ -36,14 +36,19 @@ def get_musicians_by_location_and_instruments(location_id, instrument_ids, skill
         params.extend(instrument_ids)
 
     # Add skill level conditions for each instrument
+    skill_conditions = [] # added this to try to accommodate multiple unspecified skill levels
     for i, instrument_id in enumerate(instrument_ids):
         if i < len(skill_levels) and skill_levels[i]:  # Only add the condition if skill level is specified
-            query += f" AND EXISTS (SELECT 1 FROM musician_instruments mi_skill{i} WHERE m.id = mi_skill{i}.musician_id AND mi_skill{i}.instrument_id = ? AND mi_skill{i}.skill_level >= ?)"
+            skill_conditions.append(f"(mi.instrument_id = ? AND mi.skill_level >= ?)")
             params.extend([instrument_id, skill_levels[i]])
         else:
             # If no skill level is specified, just ensure this instrument is included in the results
-            query += f" AND mi.instrument_id = ?"
+            skill_conditions.append("mi.instrument_id = ?")
             params.append(instrument_id)
+
+    # Combine all skill conditions with OR
+    if skill_conditions:
+        query += " AND (" + " OR ".join(skill_conditions) + ")"
 
     # GROUP BY clause to ensure unique musicians are returned
     query += " GROUP BY m.id HAVING COUNT(DISTINCT mi.instrument_id) = ?"    
